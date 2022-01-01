@@ -1,119 +1,87 @@
-package com.design.pattern.creational.prototype;
+// A Java program to demonstrate working of
+// Prototype Design Pattern with example
+// of a ColorStore class to store existing objects.
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-//1. The clone() contract
-interface Prototype {
- Prototype clone();
- String getName();
- void execute();
+
+abstract class Color implements Cloneable
+{
+	
+	protected String colorName;
+	
+	abstract void addColor();
+	
+	public Object clone()
+	{
+		Object clone = null;
+		try
+		{
+			clone = super.clone();
+		}
+		catch (CloneNotSupportedException e)
+		{
+			e.printStackTrace();
+		}
+		return clone;
+	}
 }
 
-class PrototypeModule {
- // 2. "registry" of prototypical objs
- private static List<Prototype> prototypes = new ArrayList<>();
+class blueColor extends Color
+{
+	public blueColor()
+	{
+		this.colorName = "blue";
+	}
 
- // Adds a feature to the Prototype attribute of the PrototypesModule class
- // obj  The feature to be added to the Prototype attribute
- public static void addPrototype(Prototype p) {
-     prototypes.add(p);
- }
-
- public static Prototype createPrototype(String name) {
-     // 4. The "virtual ctor"
-     for (Prototype p : prototypes) {
-         if (p.getName().equals(name)) {
-             return p.clone();
-         }
-     }
-     System.out.println(name + ": doesn't exist");
-     return null;
- }
+	@Override
+	void addColor()
+	{
+		System.out.println("Blue color added");
+	}
+	
 }
 
-//5. Sign-up for the clone() contract.
-//Each class calls "new" on itself FOR the client.
-class PrototypeAlpha implements Prototype {
- private String name = "AlphaVersion";
+class blackColor extends Color{
 
- @Override
- public Prototype clone() {
-     return new PrototypeAlpha();
- }
+	public blackColor()
+	{
+		this.colorName = "black";
+	}
 
- @Override
- public String getName() {
-     return name;
- }
-
- @Override
- public void execute() {
-     System.out.println(name + ": does something");
- }
+	@Override
+	void addColor()
+	{
+		System.out.println("Black color added");
+	}
 }
 
-class PrototypeBeta implements Prototype {
- private String name = "BetaVersion";
+class ColorStore {
 
- @Override
- public Prototype clone() {
-     return new PrototypeBeta();
- }
-
- @Override
- public String getName() {
-     return name;
- }
-
- @Override
- public void execute() {
-     System.out.println(name + ": does something");
- }
+	private static Map<String, Color> colorMap = new HashMap<String, Color>();
+	
+	static
+	{
+		colorMap.put("blue", new blueColor());
+		colorMap.put("black", new blackColor());
+	}
+	
+	public static Color getColor(String colorName)
+	{
+		return (Color) colorMap.get(colorName).clone();
+	}
 }
 
-class ReleasePrototype implements Prototype {
- private String name = "ReleaseCandidate";
- @Override
- public Prototype clone() {
-     return new ReleasePrototype();
- }
 
- @Override
- public String getName() {
-     return name;
- }
-
- @Override
- public void execute() {
-     System.out.println(name + ": does real work");
- }
-}
-
-public class PrototypeDemo {
- public static void main(String[] args) {
-     if (args.length > 0) {
-         initializePrototypes();
-         List<Prototype> prototypes = new ArrayList<>();
-         // 6. Client does not use "new"
-         for (String protoName : args) {
-             Prototype prototype = PrototypeModule.createPrototype(protoName);
-             if (prototype != null) {
-                 prototypes.add(prototype);
-             }
-         }
-         for (Prototype p : prototypes) {
-             p.execute();
-         }
-     } else {
-         System.out.println("Run again with arguments of command string ");
-     }
- }
-
- // 3. Populate the "registry"
- public static void initializePrototypes() {
-     PrototypeModule.addPrototype(new PrototypeAlpha());
-     PrototypeModule.addPrototype(new PrototypeBeta());
-     PrototypeModule.addPrototype(new ReleasePrototype());
- }
+// Driver class
+public class PrototypeDemo
+{
+	public static void main (String[] args)
+	{
+		ColorStore.getColor("blue").addColor();
+		ColorStore.getColor("black").addColor();
+		ColorStore.getColor("black").addColor();
+		ColorStore.getColor("blue").addColor();
+	}
 }
